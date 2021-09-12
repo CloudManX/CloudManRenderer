@@ -1,8 +1,11 @@
-#include <iostream>
+#include "CMR_Pch.h"
+#include "RenderCore/Log.h"
 
 int main()
 {
+	CMR::Log::Init();
+	CMR_CORE_INFO("Hello CloudMan!");
+
 	int n;
-	std::cout << "CloudMan Hello World!" << std::endl;
 	std::cin >> n;
 }

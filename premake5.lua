@@ -10,6 +10,13 @@ workspace "CloudManRenderer"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- Include directories relative to root folder
+IncludeDir = {}
+IncludeDir["GLFW"] = "3rdparty/GLFW/include"
+
+ls
+-- include "%{prj.location}/3rdparty/GLFW"
+
 project "CloudManRenderer"
     location "CloudManRenderer"
     kind "ConsoleApp"
@@ -18,6 +25,9 @@ project "CloudManRenderer"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}") 
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     
+    pchheader "CMR_Pch.h"
+    pchsource "%{prj.name}/src/RenderCore/CMR_Pch.cpp"
+
     files
     {
         "%{prj.name}/src/**.h",
@@ -26,7 +36,13 @@ project "CloudManRenderer"
 
     includedirs 
     {
+        "3rdparty/spdlog/include",
+        "%{IncludeDir.GLFW}"
+    }
 
+    links
+    {
+        "opengl32.lib"
     }
     
     filter "system:windows"
