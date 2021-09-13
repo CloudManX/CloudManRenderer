@@ -14,8 +14,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "3rdparty/GLFW/include"
 
-ls
--- include "%{prj.location}/3rdparty/GLFW"
+include "/3rdparty/GLFW"
 
 project "CloudManRenderer"
     location "CloudManRenderer"
@@ -26,7 +25,7 @@ project "CloudManRenderer"
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     
     pchheader "CMR_Pch.h"
-    pchsource "%{prj.name}/src/RenderCore/CMR_Pch.cpp"
+    pchsource "%{prj.name}/src/CMR_Pch.cpp"
 
     files
     {
@@ -37,17 +36,19 @@ project "CloudManRenderer"
     includedirs 
     {
         "3rdparty/spdlog/include",
+        "%{prj.name}/src",
         "%{IncludeDir.GLFW}"
     }
 
     links
     {
-        "opengl32.lib"
+        "opengl32.lib",
+        "GLFW"
     }
     
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
+        staticruntime "Off"
         systemversion "10.0.19041.0"
 
         defines

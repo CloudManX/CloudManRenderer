@@ -15,4 +15,6 @@
 	#include <Windows.h>
 #endif
 
+#include "RenderCore/Log.h"
+
 
