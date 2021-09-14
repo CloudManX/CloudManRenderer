@@ -13,8 +13,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to root folder
 IncludeDir = {}
 IncludeDir["GLFW"] = "3rdparty/GLFW/include"
+IncludeDir["glad"] = "3rdparty/glad/include"
 
 include "/3rdparty/GLFW"
+include "/3rdparty/glad"
 
 project "CloudManRenderer"
     location "CloudManRenderer"
@@ -37,13 +39,15 @@ project "CloudManRenderer"
     {
         "3rdparty/spdlog/include",
         "%{prj.name}/src",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.glad}"
     }
 
     links
     {
         "opengl32.lib",
-        "GLFW"
+        "GLFW",
+        "glad"
     }
     
     filter "system:windows"
@@ -53,7 +57,8 @@ project "CloudManRenderer"
 
         defines
         {   
-            "CMR_PLATFORM_WINDOWS"
+            "CMR_PLATFORM_WINDOWS",
+            "GLFW_INCLUDE_NONE"
         }
 
 

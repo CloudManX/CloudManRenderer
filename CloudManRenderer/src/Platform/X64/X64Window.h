@@ -1,7 +1,8 @@
 #pragma once
 
 #include "RenderCore/Window.h"
-#include <GLFW/glfw3.h>
+
+struct GLFWwindow;
 
 namespace CMR
 {
@@ -20,6 +21,8 @@ namespace CMR
 		
 		virtual void Shutdown();
 
+		~X64Window();
+
 	private:
 		virtual void Init(const WindowProps& props);
 
@@ -33,6 +36,8 @@ namespace CMR
 		};
 
 		X64WindowData m_Data;
+
+		static void ShutdownGLFWWindow(GLFWwindow* Window);
 	};
 
 

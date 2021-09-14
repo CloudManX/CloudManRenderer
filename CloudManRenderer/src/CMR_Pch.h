@@ -16,5 +16,6 @@
 #endif
 
 #include "RenderCore/Log.h"
+#include "RenderCore/Core.h"
 
 

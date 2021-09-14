@@ -1,19 +1,23 @@
 #include "CMR_pch.h"
+#include "RenderCore/Core.h"
 #include "Platform/X64/X64Window.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace CMR
 {
-	static bool s_GLFWInitialized = false;
+	static int s_GLFWWindowCount = 0;
 
-	Window* Window::Create(const WindowProps& props)
+	Window* Window::Create(const WindowProps& Props)
 	{
-		return new X64Window(props);
+		return new X64Window(Props);
 	}
 
 
-	X64Window::X64Window(const WindowProps& props)
+	X64Window::X64Window(const WindowProps& Props)
 	{
-		Init(props);
+		Init(Props);
 	}
 
 	void X64Window::OnUpdate()
@@ -44,25 +48,27 @@ namespace CMR
 
 	void X64Window::Shutdown()
 	{
-		glfwDestroyWindow(m_Window);
+		ShutdownGLFWWindow(m_Window);
 	}
 
-	void X64Window::Init(const WindowProps& props)
+	X64Window::~X64Window()
 	{
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
-		
-		CMR_CORE_INFO("Creating Window {0} ({1}, {2}}", props.Title, props.Width, props.Height);
+		Shutdown();
+	}
 
-		if (!s_GLFWInitialized)
+	void X64Window::Init(const WindowProps& Props)
+	{
+		m_Data.Title = Props.Title;
+		m_Data.Width = Props.Width;
+		m_Data.Height = Props.Height;
+		
+		CMR_CORE_INFO("Creating Window {0} ({1}, {2})", Props.Title, Props.Width, Props.Height);
+
+		if (!s_GLFWWindowCount)
 		{
 			int success = glfwInit();
-			if (!success)
-			{
-				CMR_CORE_ERROR("GLFW Initialization Failed");
-			}
-			s_GLFWInitialized = true;
+			CMR_CORE_ASSERT(success, "GLFW Initialization Failed");
+			++s_GLFWWindowCount;
 		}
 
 		m_Window = glfwCreateWindow(
@@ -71,10 +77,37 @@ namespace CMR
 			m_Data.Title.c_str(), 
 			nullptr, 
 			nullptr);
-		
 		glfwMakeContextCurrent(m_Window);
-		glfwSetWindowUserPointer(m_Window, &m_Data);
+
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		CMR_CORE_ASSERT(status, "Glad Initialziation Failed!")
+		CMR_CORE_INFO("Glad is Initailized.");
 		
+		glfwSetWindowUserPointer(m_Window, &m_Data);
+
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* Window)
+		{
+			X64Window::ShutdownGLFWWindow(Window);
+		});
+
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* Window, int Width, int Height)
+		{
+			X64WindowData& Data= *(X64WindowData*)glfwGetWindowUserPointer(Window);
+			Data.Width = Width;
+			Data.Height = Height;
+		});
+		
+	}
+
+	void X64Window::ShutdownGLFWWindow(GLFWwindow* Window)
+	{
+		glfwDestroyWindow(Window);
+		--s_GLFWWindowCount;
+
+		if (s_GLFWWindowCount == 0)
+		{
+			glfwTerminate();
+		}
 	}
 
 }
